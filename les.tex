@@ -1,0 +1,425 @@
+\documentclass{note}
+\title{Long exact sequences in homotopy type theory}
+\author{Lukas Stoll}
+
+\addbibresource{bib/vanDoorn2018.bib}
+\addbibresource{bib/hottbook.bib}
+\begin{document}
+\maketitle
+
+\section{Fiber sequences of pointed types}
+
+\begin{definition}
+  \hfill
+  \begin{enumerate}
+    \item A \emph{pointed type} is a type $A:\Type$ together with a \emph{base point} $a_0:A$.
+      We denote the type of pointed types (in the universe $\Type$) by $\Type^*$.
+      Given a pointed type $(A,a_0)$ we often suppress its base point $a_0$.
+    \item A map $f:A → B$ between (the underlying types of) two pointed types is \emph{pointed} if $f(a_0)=b_0$.
+      We denote the type of pointed maps by $A →^* B$.
+      It is a pointed type whose base point is the constant map $\const_{b_0}:A →^* B$ with value $b_0$.
+      Given a pointed map $(f,f_0)$ we often suppress the equality $f_0:f(a_0)=b_0$.
+  \end{enumerate}
+\end{definition}
+
+\begin{example}
+  \hfill
+  \begin{enumerate}
+    \item The identity map of any pointed type $A:\Type^*$ is pointed via the equality $(\id_A)_0 \colonequiv \refl_{a_0}:\id_A(a_0)=a_0$.
+    \item Given two pointed maps $f:A →^* B$, $g:B →^* C$, their composition $g∘f : A → C$ is pointed, namely $g(f(a_0))=g(b_0)=c_0$ via the concatenation $(g∘f)_0\colonequiv \ap_g(f_0) ⋅ g_0$.
+    \item Given a pointed map $f:A →^* B$, its \emph{fiber} $\fib_f\colonequiv (a:A) × (f(a)=b_0)$ is pointed with base point $(a_0,f_0)$.
+    \item For a pointed type $A$, its \emph{loop space} $ΩA\colonequiv a_0=a_0$ is pointed with base point $\refl_{a_0}$.
+      A pointed map $f:A →^* B$ induces a pointed map $Ωf:ΩA →^* ΩB$ defined by $Ωf(p) \colonequiv f_0^{-1}⋅\ap_f(p)⋅f_0$.
+      The assignment $f ↦ Ωf$ is functorial in that $Ω(\id_A)=\id_{ΩA}$ and $Ω(g∘f) = Ωg ∘ Ωf$ for a second pointed map $g:B →^* C$.
+  \end{enumerate}
+\end{example}
+
+\begin{definition}
+  Let $p:E →^* B$ be a pointed map.
+  Its \emph{fiber sequence} is the sequence of pointed maps
+  \begin{center}
+    \begin{tikzcd}
+      \cdots
+      \arrow[r]
+      & \fib^2_p
+      \arrow[r,"p^{(2)}"]
+      & \fib^1_p
+      \arrow[r,"p^{(1)}"]
+      & \fib^0_p
+      \arrow[r,"p^{(0)}"]
+      & \fib^{-1}_p
+    \end{tikzcd}
+  \end{center}
+  defined recursively by setting
+  \begin{align*}
+    \fib_p^{-1}&\colonequiv B,
+    \quad \fib_p^{(0)} \colonequiv E,
+    \quad p^0\colonequiv p,\\
+    \fib_p^{n+1}&\colonequiv \fib_{p^{(n)}},
+    \quad p^{(n+1)}\colonequiv \pr_1:\fib^{n+1}_p → \fib^n_p.
+  \end{align*}
+\end{definition}
+
+\begin{lemma}
+  Let $p:E →^* B$ be a pointed map, denote its fiber by $F$ and the projection $\pr_1$ by $i:F →^* E$.
+  There is a commutative diagram of pointed maps
+  \begin{center}
+    \begin{tikzcd}[column sep=large]
+      \fib^4_p 
+        \arrow[r,"p^{(4)}"]
+        \arrow[d,"\sim" sloped]
+      & \fib^3_p
+        \arrow[r,"p^{(3)}"]
+        \arrow[d,"\sim" sloped]
+      & \fib^2_p
+        \arrow[d,"\sim" sloped]
+      \\
+      ΩF
+        \arrow[r,"-Ωi"]
+      & ΩE
+        \arrow[r,"-Ωp"]
+      & ΩB
+    \end{tikzcd}
+  \end{center}
+  where the vertical maps are equivalences and $-Ωp\colonequiv Ωp ∘ (x ↦ x^{-1})$.
+\end{lemma}
+\begin{proof}
+  By the recursion formula for the fiber sequence, $p^{(n+k+1)}:\fib^{n+k+1}_p → \fib^{n+k}_p$ is judgementally equal to $(p^{(k)})^{(n+1)}:\fib^{n+1}_{p^{(k)}} → \fib^n_{p^{(k)}}$.
+  In particular, if we can find a procedure which, given $p$, produces the right commutative square in the diagram above, applying this procedure to $i≡p^{(1)}$ yields the left commutative square.
+  Moreover, constructing an equivalence $e_p:\fib^2_p ≃ ΩB$ for arbitrary $p$ gives us an an equivalence $e_i:\fib^3_p ≡ \fib^2_i ≃ ΩE$, we just need to check that these are compatible in the desired manner.
+  For the construction of such an equivalence and the commutative square, see \cite[Lemma 8.4.4]{hottbook}.
+\end{proof}
+
+\begin{theorem}\label{theorem:fiber-sequence}
+  The fiber sequence of a pointed map $p: E →^* B$ is equivalent to
+  \begin{center}
+    \begin{tikzcd}[column sep=6mm, cramped]
+      \cdots
+      \arrow[r]
+      & Ω^2F
+        \arrow[r,"Ω^2i"]
+      & Ω^2E
+        \arrow[r,"Ω^2p"]
+      & Ω^2B
+        \arrow[r,"δ"]
+      & ΩF
+        \arrow[r,"-Ωi"]
+      & ΩE
+        \arrow[r,"-Ωp"]
+      & ΩB
+        \arrow[r,"δ"]
+      & F
+        \arrow[r,"i"]
+      & E
+        \arrow[r,"p"]
+      & B
+    \end{tikzcd}
+  \end{center}
+  where we denote the fiber of $p$ by $i:F → E$.
+\end{theorem}
+\begin{proof}
+  By an equivalence of sequences we mean a sequence of equivalences, connecting the fiber sequence with the above sequence vertically.
+  Using the recursion formula for the fiber sequence, the existence of these vertical equivalences and the connecting maps $δ$ follows immediately from the lemma above.
+\end{proof}
+
+
+\section{Homotopy groups of pointed types}
+
+\begin{definition}
+  A sequence $A \overset{f}{→} B \overset{g}{→} C$ of pointed maps between pointed sets is \emph{exact at $B$} if the proposition
+  $$
+  ∀_{b:B} \left( ∃_{a:A} f(a)=b \right) ↔ g(b)=c_0
+  %(b : B) → \|(a : A) × f(a) = b\|_{-1} ↔ g(b)=c_0
+  $$
+  holds.%
+  \footnote{Recall that for $X:\Type$ and $Y:X → \Type$ a dependent type, $\exists_{x:X}Y(x)\colonequiv \|(x:X) × Y(x)\|_{-1}$ and $∀_{x:X}Y(x)\colonequiv (x:X) → Y(x)$.}
+  More generally, a longer sequence of pointed maps is \emph{exact} if each pair of consecutive maps in the sequence is exact in the sense above.
+\end{definition}
+
+\begin{remark}
+  \hfill
+  \begin{enumerate}
+    \item Recall that a map $i:X → B$ is called an \emph{embedding} if 
+      $$
+      \ap_i : x=y → f(x)=f(y)
+      $$
+      is an equivalence for all $x,y:X$ and \emph{$(-1)$-truncated} if $\fib_f(b)$ is a proposition for all $b:B$. 
+      These two conditions are equivalent and if either is satisfied we call $X$ a \emph{subtype} of $B$.
+    \item Any predicate $P:B → \Prop$ on $B$ gives rise to a subtype, namely the dependent pair type $\{b:B \mid P(b)\}\colonequiv \sum_{b:B}P(b)$ together with its canonical projection to $B$.
+      Every subtype is equivalent to one of this form.
+    \item Denote the type of subtypes of a type $B$ by $\Sub(B)\colonequiv (i:X → B) × \mathsf{isEmbedding}(i)$.
+      Its equality type is
+      $$
+      \left( i =_{\Sub(B)} j \right) ≃ \left( ∀_{b:B} \fib_i(b) ↔ \fib_j(b) \right).
+      $$
+    \item Given a sequence $A \overset{f}{→} B \overset{g}{→} C$ of pointed maps between pointed sets, define
+      \begin{itemize}
+        \item the \emph{image} of $f$ as the subtype $\im(f)\colonequiv\{b:B \mid ∃_{a:A}f(a)=b \}$,
+        \item the \emph{kernel} of $g$ as the subtype $\ker(g)\colonequiv\{b:B \mid g(b)=c_0\}$.
+      \end{itemize}
+      The sequence is exact at $B$ if and only if $\im(f)=\ker(g)$ as subtypes of $B$.
+  \end{enumerate}
+\end{remark}
+
+\begin{proposition}
+  Let $p:E →^* B$ be a pointed map with fiber $i:F →^* E$.
+  Then 
+  $$
+  \|F\|_0 \overset{\|i\|_0}{→} \|E\|_0 \overset{\|p\|_0}{→} \|B\|_0
+  $$
+  is an exact sequence of pointed sets.
+\end{proposition}
+\begin{proof}
+  See \cite[in the proof of Theorem 8.4.6]{hottbook}.
+\end{proof}
+
+\begin{definition}
+  Let $X$ be a pointed type.
+  Its \emph{$n$-th homotopy group} is the set
+  $$
+  π_n(X)\colonequiv π_n(X,x_0)\colonequiv \|Ω^nX\|_0.
+  $$
+  A pointed map $f:X →^* Y$ induces a map of homotopy groups
+  $$
+  π_n(f)\colonequiv π_n(f,f_0)\colonequiv \|Ω^nf\|_0.
+  $$
+\end{definition}
+
+\begin{theorem}
+  Every pointed map $p:E →^* B$ with fiber $i:F →^* E$ induces a long exact sequence of homotopy groups
+  \begin{center}
+    \begin{tikzcd}[cramped]
+      \cdots \arrow[r]
+      & π_1(F) \arrow[r,"π_1(i)"]
+      & π_1(E) \arrow[r,"π_1(p)"]
+      & π_1(B) \arrow[r]
+      & π_0(F) \arrow[r,"π_0(i)"]
+      & π_0(E) \arrow[r,"π_0(p)"]
+      & π_0(B)
+    \end{tikzcd}
+  \end{center}
+\end{theorem}
+
+
+\section{Homotopy groups of spectra}
+
+\begin{definition}
+  \hfill
+  \begin{enumerate}
+    \item Let $f,g:A →^* B$ be two pointed maps.
+      A homotopy $H:f\sim g$ is \emph{pointed} if $H(a_0)=f_0⋅g_0^{-1}$.
+      We denote the type of pointed homotopies between $f$ and $g$ by $f\sim^* g$.
+    \item Let $f:A →^* B$ be a pointed map.
+      If the type $\isEquiv^*(f)\colonequiv (g:B→^*A)×(g∘f \sim^* \id_A) × (h:B →^*A)×(f∘h\sim^*\id_B)$ is inhabited we call $f$ a \emph{pointed equivalence}.
+      We obtain the type of pointed equivalences $A≃^* B\colonequiv (f:A →^* B) × \isEquiv^*(f)$ between the pointed types $A$ and $B$.
+  \end{enumerate}
+\end{definition}
+
+
+\begin{definition}
+  \hfill
+  \begin{enumerate}
+    \item A \emph{spectrum} is a sequence $E:ℤ → \Type^*$ of pointed types together with a sequence of pointed equivalences $σ : (n : ℤ) → E_n ≃^* ΩE_{n+1}$.
+      Denote the type of spectra (in the universe $\Type$) by $\Spectrum$.
+      Given a spectrum $(E,σ)$ we often suppress the equivalence $σ$.
+    \item A \emph{spectrum map} from a spectrum $E$ to a spectrum $E$ is a fiberwise pointed map $f:(n:ℤ) → E_n → E'_n$ such that $(n:ℤ) → σ' ∘ f_n \sim^* Ωf_{n+1} ∘ σ$.
+      Write $E → E'$ for the type of spectrum maps.
+  \end{enumerate}
+\end{definition}
+
+\begin{example}
+  Let $p:E → B$ be a spectrum map.
+  Define $\fib_p:ℤ → \Type^*$ by setting $(\fib_p)_n\colonequiv \fib_{p_n}$.
+  We want to show that this defines a spectrum and that degreewise projection defines a spectrum map $\pr_1:\fib_p → E$.
+  For this, consider the following diagram for all $n:ℤ$:
+  \begin{center}
+    \begin{tikzcd}[sep=2.5em,cramped]
+      & \fib_{p_n}
+        \arrow[r,"\pr_1"]
+        \arrow[d,"\sim" sloped]
+        \arrow[dl,dashed,"σ"]
+      & E_n
+        \arrow[r,"p_n"]
+        \arrow[d,"\sim" sloped]
+      & B_n
+        \arrow[d,"\sim" sloped]
+      \\
+      Ω\fib_{p_{n+1}}
+        \arrow[r,"\sim"]
+      & \fib_{Ωp_{n+1}}
+        \arrow[r,"\pr_1"]
+      & ΩE_{n+1}
+        \arrow[r,"Ωp_{n+1}"]
+      & ΩB_{n+1}
+    \end{tikzcd}
+  \end{center}
+  The right square commutes because $p$ is a spectrum map.
+  By \cref{lemma:fiber-projection-naturality} this induces the leftmost vertical equivalence making the left square commute.
+  The equivalence $Ω\fib_{p_{n+1}} ≃^* \fib_{Ωp_{n+1}}$ is obtained by applying \cref{theorem:fiber-sequence} to the fiber sequence for $p_{n+1}$.
+  This allows us to define the dashed map $σ$ in exactly one way (up to homotopy) making the triangle commute.
+  In particular, $σ$ becomes an equivalence, making $\fib_p$ a spectrum and $\pr_1:\fib_p → E$ a spectrum map.
+\end{example}
+
+\begin{lemma}\label{lemma:fiber-projection-naturality}
+  Consider the following diagram of pointed maps:
+  \begin{center}
+    \begin{tikzcd}
+      \fib_f
+        \arrow[r,"\pr_1"]
+        \arrow[d,dashed,"\fib_{(h,i)}"']
+      & A
+        \arrow[r,"f"]
+        \arrow[d,"h"]
+      & B
+        \arrow[d,"i"]
+      \\
+      \fib_g
+        \arrow[r,"\pr_1"]
+      & C
+        \arrow[r,"g"]
+      & D
+    \end{tikzcd}
+  \end{center}
+  If the right diagram commutes via a pointed homotopy $H:g∘h \sim^* i∘f$, the dashed map exists and the left diagram commutes as well (via a pointed homotopy).
+  Moreover, if $h$ and $i$ are pointed equivalences, so is $\fib_{(h,i)}$.
+\end{lemma}
+\begin{proof}
+  We define $\fib_{(h,i)}(a,p) \colonequiv (h(a), H_a ⋅ \ap_i(p) ⋅ i_0)$ and a homotopy $\fib_{(h,i)} ∘ \pr_1 \sim \pr_1 ∘ h$ by $(a,p) ↦ \refl_{h(a)}$.
+  We leave it to the reader to verify that $\fib_{(i,h)}$ and the given homotopy are pointed and that $\fib_{(i,h)}$ has a pointed inverse if $i$ and $h$ are equivalences.
+\end{proof}
+
+\begin{definition}
+  Let $E$ be a spectrum.
+  Its \emph{$n$-th homotopy group} is defined as
+  $$
+  π_n(E)\colonequiv π_2(E_{2-n}).
+  $$
+  A spectrum map $f:E → E'$ induces a map of homotopy groups
+  $$
+  π_n(f)\colonequiv π_2(f_{n-2}).
+  $$
+\end{definition}
+
+\begin{remark}
+  Note that for a spectrum $E$ and for $n,m,k:ℤ$ with $n+k≥0$ we have $Ω^{n+k}E_{m+k} ≃ Ω^nE_m$.
+  In particular, the homotopy groups of $E$ are given by
+  $$
+  π_n(E) ≃ π_0(E_{-n}) ≃ π_1(E_{1-n}) ≃ π_2(E_{2-n}) ≃ π_3(E_{3-n}) ≃ \cdots ≃ π_k(E_{k-n}) ≃ \cdots.
+  $$
+\end{remark}
+
+\begin{theorem}
+  Every spectrum map $p:E → B$ with fiber $i:F → E$ induces a long exact sequence of homotopy groups
+  \begin{center}
+    \begin{tikzcd}[cramped]
+      \cdots \arrow[r]
+      & π_{n+1}(B) \arrow[r,"𝜕"]
+      & π_n(F) \arrow[r,"π_1(i)"]
+      & π_n(E) \arrow[r,"π_1(p)"]
+      & π_n(B) \arrow[r,"𝜕"]
+      & π_{n-1}(F) \arrow[r]
+      & \cdots
+    \end{tikzcd}
+  \end{center}
+\end{theorem}
+\begin{proof}
+  For each $n:ℤ$ we have a fiber sequence $F_n \overset{i_n}{→} E_n \overset{p_n}{→} B_n$ which induce exact sequences of homotopy groups together with connecting equivalences of the following form:
+  \begin{center}
+    \begin{tikzcd}[column sep=1.2em,row sep=5em]
+      & \cdots
+        \arrow[r]
+      & π_2(F_{2-n})
+        \arrow[r]
+      & π_2(E_{2-n})
+        \arrow[r]
+      & π_2(B_{2-n})
+        \arrow[r]
+        \arrow[llld,"\sim" sloped]
+      & π_1(F_{2-n})
+        \arrow[r]
+        \arrow[llld,"\sim" sloped]
+      & \cdots
+      \\
+      \cdots
+        \arrow[r]
+      & π_3(B_{3-n})
+        \arrow[r]
+      & π_2(F_{3-n})
+        \arrow[r]
+      & π_2(E_{3-n})
+        \arrow[r]
+      & π_2(B_{3-n})
+        \arrow[r]
+      & \cdots
+    \end{tikzcd}
+  \end{center}
+  The diagonal equivalences are part of a square, whose commutativity can be observed by iteratively applying \cref{lemma:fiber-projection-naturality} to the structure square of the spectrum map $p$.
+  We thus obtain connecting maps $𝜕:π_2(B_{2-n}) → π_2(F_{3-n}) = π_2(F_{2-(n-1)})$ that fit into a long exact sequence as depicted above.
+\end{proof}
+
+\section{Cohomology groups with values in dependent spectra}
+
+\begin{lemma}
+  Let $X:\Type$ and $Y:X → \Type^*$.
+  The type of dependent functions $(x:X) → Y(x)$ is pointed with basepoint the fibrewise constant map sending $x:X$ to the basepoint of $Y(x)$.
+  Then $Ω((x:X) → Y(x)) ≃ (x:X) → ΩY(x)$, natural in $Y$.
+\end{lemma}
+
+\begin{definition}
+  Let $X:\Type$ and $E:X → \Spectrum$ be a dependent spectrum.
+  Define a sequence of pointed types $(x:X) → E(x)$ by
+  $$
+  ((x:X) → E(x))_n \colonequiv (x:X) → E(x)_n.
+  $$
+  By the previous lemma this defines a spectrum, the \emph{dependent mapping spectrum} of $E$.
+\end{definition}
+
+\begin{lemma}
+  Let $p:(x:X) → E(x) → B(x)$ a fibrewise spectrum map between dependent spectra $E,B:X → \Spectrum$.
+  \begin{enumerate}
+    \item Pointwise postcomposition defines a spectrum map $∏_p:((x:X) → E(x)) → ((x:X) → B(x))$ between dependent mapping spectra.
+    \item The fiber spectrum of $∏_p$ is equivalent to the dependent mapping spectrum $(x:X) → F(x)$ where $F:X → \Spectrum$ is the dependent spectrum given by $F(x)\colonequiv\fib_{p(x)}$.
+      Moreover, this equivalence is compatible with the pointwise inclusion $i(x):F(x) → E(x)$.
+  \end{enumerate}
+\end{lemma}
+\begin{proof}
+  See \cite[Lemma 5.4.9]{vanDoorn2018}.
+\end{proof}
+
+\begin{definition}
+  Let $X:\Type$ and $E:X → \Spectrum$ a dependent spectrum.
+  The \emph{$n$-th cohomology of $X$ with values in $E$} is the homotopy group
+  $$
+  H^n(X,E) \colonequiv π_{-n}((x:X) → E(x)).
+  $$
+\end{definition}
+
+\begin{theorem}
+  Let $p:(x:X) → E(x) → B(x)$ be a fibrewise map of dependent spectra $E,B:X → \Spectrum$ over a type $X:\Type$ and denote its fiber by $F:X → \Spectrum$.
+  There is a long exact sequence of the form
+  \begin{center}
+    \begin{tikzcd}[cramped,column sep=1em]
+      \cdots
+        \arrow[r]
+      &H^{n-1}(X,B)
+        \arrow[r]
+      & H^n(X,F)
+        \arrow[r]
+      & H^n(X,E)
+        \arrow[r]
+      & H^n(X,B)
+        \arrow[r]
+      & H^{n+1}(X,F)
+        \arrow[r]
+      & \cdots
+    \end{tikzcd}.
+  \end{center}
+\end{theorem}
+\begin{proof}
+  By the lemma above we know that $(x:X) → F(x)$ is the fiber of $∏_p$.
+  The sequence above thus is the exact sequence of homotopy groups of spectra associated to the spectrum map $∏_p$ between mapping spectra.
+\end{proof}
+
+\nocite{*}
+\printbibliography
+\end{document}
