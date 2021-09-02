@@ -17,6 +17,7 @@
   \RequirePackage[style=alphabetic,useprefix=true]{biblatex}
 \fi
 
+
 \RequirePackage{fontspec}
 \RequirePackage{unicode-math}
 
@@ -28,7 +29,6 @@
 
 \RequirePackage{macros}
 
-\renewcommand{\date}[1]{\thanks{Date: {#1}}}
 
 \setlist[description]{labelindent=\parindent}
 \setenumerate[1]{label=(\alph*)}
